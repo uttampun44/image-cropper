@@ -18,6 +18,38 @@ const ImageCrop: React.FC<ImageCropProps> = ({accept,className,style,type,ratio,
     setImage(e.target.files[0]);
   };
 
+  const startDrag = (event: React.MouseEvent<HTMLDivElement>) =>{
+    event.preventDefault();
+
+
+    const initialX = event.clientX;
+    const initialY = event.clientY;
+
+    const cropDiv = cropTransparentRef.current;
+    if (!cropDiv) return;
+
+    const initialLeft = cropDiv.offsetLeft;
+    const initialTop = cropDiv.offsetTop;
+
+    const onMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - initialX;
+      const deltaY = e.clientY - initialY;
+
+      cropDiv.style.left = `${initialLeft + deltaX}px`;
+      cropDiv.style.top = `${initialTop + deltaY}px`;
+    };
+
+
+    const mouseMove = () =>{
+      document.addEventListener("mousemove", onMouseMove)
+      document.addEventListener("mouseup", mouseMove)
+    }
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mousedown", mouseMove);
+
+  }
+
   useEffect(() => {
     if (!image) return;
 
@@ -41,7 +73,7 @@ const ImageCrop: React.FC<ImageCropProps> = ({accept,className,style,type,ratio,
             <>
               <img src={imagesrc} style={{ width: "100%", margin: "1em 0em" }} />
               <div className="cropOverlay" ref={cropOverlayRef}></div>
-              <div className="cropTransparent" ref={cropTransparentRef}></div>
+              <div className="cropTransparent" ref={cropTransparentRef} onMouseDown={startDrag}></div>
 
               </>
           
